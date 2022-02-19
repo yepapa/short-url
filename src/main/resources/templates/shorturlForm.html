@@ -1,0 +1,46 @@
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org" xmlns="http://www.w3.org/1999/html">
+<head>
+    <title>Short URL 생성기</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script>
+        $(document).ready(function () {
+            $("#btnShortUrl").click(function (event) {
+                let originUrl = $("#originUrl").val();
+
+                $.ajax({
+                    type: "POST",
+                    url: "/short-url/create",
+                    contentType: "application/json; charset=utf-8",
+                    dataType: "json",
+                    data: JSON.stringify({'originUrl': originUrl}),
+                    success: function (result) {
+                        $("#a-short-url").text(result.shortUrl);
+                        $("#a-short-url").attr("href", result.shortUrl);
+                    },
+                    error: function (xhr, textStatus, errorThrown) {
+                        let wrapShortUrl = $("wrap-short-url");
+                        let wrapError = $("wrap-error");
+                        wrapShortUrl.hide();
+                        wrapError.show();
+
+                        let error = jQuery.parseJSON(xhr.responseText);
+                        alert(error.errors[0].defaultMessage);
+                    }
+                });
+            });
+        });
+    </script>
+</head>
+<body>
+<form>
+    short url을 생성할 url을 입력하세요
+    <input type="text" id="originUrl" name="originUrl"/>
+    <input type="button" id="btnShortUrl" value="Short URL 생성"/>
+</form>
+<span id="wrap-short-url">
+    <a id="a-short-url" target="_blank"></a>
+</span>
+</body>
+</html>
